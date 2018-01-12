@@ -1,11 +1,10 @@
 module GameState
     exposing
         ( Game(..)
-        , map
-        , untag
         , GameDefinition
         , PlayState
         , loading
+        , updateGameDefinition
         , updatePlayState
         , updateScore
         , toReady
@@ -14,31 +13,7 @@ module GameState
         , toGameOver
         )
 
--- Reusable state machine concepts.
-
-
-type Allowed
-    = Allowed
-
-
-type State trans model
-    = State model
-
-
-
--- Permitted operations on State that do not allow arbitrary states to be
--- constructed in order to bypass the type checking on state transitions.
-
-
-map : (a -> b) -> State tag a -> State tag b
-map f (State x) =
-    State (f x)
-
-
-untag : State tag value -> value
-untag (State x) =
-    x
-
+import StateMachine exposing (..)
 
 
 -- An Example model for a game of some kind.
@@ -112,25 +87,35 @@ gameOver definition score =
 -- Update functions that can be applied when parts of the model are present.
 
 
-updateScore : Int -> PlayState -> PlayState
-updateScore score play =
-    { play | score = score }
+mapDefinition : (a -> b) -> ({ m | definition : a } -> { m | definition : b })
+mapDefinition func =
+    \model -> { model | definition = func model.definition }
+
+
+mapPlay : (a -> b) -> ({ m | play : a } -> { m | play : b })
+mapPlay func =
+    \model -> { model | play = func model.play }
 
 
 updateGameDefinition :
     (GameDefinition -> GameDefinition)
     -> State p { m | definition : GameDefinition }
     -> State p { m | definition : GameDefinition }
-updateGameDefinition func (State model) =
-    State { model | definition = func model.definition }
+updateGameDefinition func state =
+    map (mapDefinition func) state
 
 
 updatePlayState :
     (PlayState -> PlayState)
     -> State p { m | play : PlayState }
     -> State p { m | play : PlayState }
-updatePlayState func (State model) =
-    State { model | play = func model.play }
+updatePlayState func state =
+    map (mapPlay func) state
+
+
+updateScore : Int -> PlayState -> PlayState
+updateScore score play =
+    { play | score = score }
 
 
 
