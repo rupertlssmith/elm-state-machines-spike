@@ -21,8 +21,8 @@ type alias Model =
     }
 
 
-msgToCmd msg =
-    Task.perform (\() -> msg) (Task.succeed ())
+message msg =
+    Task.perform identity (Task.succeed msg)
 
 
 main =
@@ -40,7 +40,7 @@ init =
       , previous = []
       , count = 5
       }
-    , msgToCmd <| Loaded { boardSize = 100 }
+    , message <| Loaded { boardSize = 100 }
     )
 
 
@@ -54,22 +54,22 @@ update msg model =
             case ( model.game, (Debug.log "update" msg) ) of
                 ( Loading loading, Loaded gameDefinition ) ->
                     ( { model | game = toReadyWithGameDefinition gameDefinition loading }
-                    , msgToCmd StartGame
+                    , message StartGame
                     )
 
                 ( Ready ready, StartGame ) ->
                     ( { model | game = toInPlay { score = 0, position = [] } ready }
-                    , msgToCmd <| Die 123
+                    , message <| Die 123
                     )
 
                 ( InPlay inPlay, Die finalScore ) ->
                     ( { model | game = toGameOver <| (updatePlayState <| updateScore finalScore) inPlay }
-                    , msgToCmd AnotherGo
+                    , message AnotherGo
                     )
 
                 ( GameOver gameOver, AnotherGo ) ->
                     ( { model | game = toReady gameOver }
-                    , msgToCmd StartGame
+                    , message StartGame
                     )
 
                 ( _, _ ) ->
