@@ -30,33 +30,17 @@ type alias PlayState =
     }
 
 
-type Game
-    = Loading Loading
-    | Ready Ready
-    | InPlay InPlay
-    | GameOver GameOver
 
-
-
--- The state definitions with enough typing information to enforce matching
+-- The state definitions have enough typing information to enforce matching
 -- states against legal state transitions, and against the available data model
 -- in the state.
 
 
-type alias Loading =
-    State { ready : Allowed } {}
-
-
-type alias Ready =
-    State { inPlay : Allowed } { definition : GameDefinition }
-
-
-type alias InPlay =
-    State { gameOver : Allowed } { definition : GameDefinition, play : PlayState }
-
-
-type alias GameOver =
-    State { ready : Allowed } { definition : GameDefinition, finalScore : Int }
+type Game
+    = Loading (State { ready : Allowed } {})
+    | Ready (State { inPlay : Allowed } { definition : GameDefinition })
+    | InPlay (State { gameOver : Allowed } { definition : GameDefinition, play : PlayState })
+    | GameOver (State { ready : Allowed } { definition : GameDefinition, finalScore : Int })
 
 
 
