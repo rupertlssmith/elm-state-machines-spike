@@ -59,7 +59,7 @@ update msg model =
                     )
 
                 ( Ready ready, StartGame ) ->
-                    ( { model | game = toInPlay { score = 0, position = [] } ready }
+                    ( { model | game = toInPlayWithPlayState { score = 0, position = [] } ready }
                     , message <| Die 123
                     )
 

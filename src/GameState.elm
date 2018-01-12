@@ -10,7 +10,7 @@ module GameState
         , updateScore
         , toReady
         , toReadyWithGameDefinition
-        , toInPlay
+        , toInPlayWithPlayState
         , toGameOver
         )
 
@@ -148,8 +148,8 @@ toReadyWithGameDefinition definition game =
     ready definition
 
 
-toInPlay : PlayState -> State { a | inPlay : Allowed } { m | definition : GameDefinition } -> Game
-toInPlay play (State model) =
+toInPlayWithPlayState : PlayState -> State { a | inPlay : Allowed } { m | definition : GameDefinition } -> Game
+toInPlayWithPlayState play (State model) =
     inPlay model.definition play
 
 
